@@ -1,6 +1,3 @@
-そのまま `README.md` にコピー＆ペーストして使える形式で作成しました。GitHub上のレンダリングに対応した **Mermaid記法の構成図**、構成概要、作成リソース一覧、このシナリオで学べるポイントを網羅しています。
-
----
 
 # シナリオ1：【IaaS】VPCとCompute Engineで作るセキュアなWebサーバー環境
 
@@ -57,16 +54,20 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    User ((ユーザー)) -->|HTTPアクセス| Run ["Cloud Run (v2)<br>(handson-app)"]
+    User((ユーザー))
     
     subgraph GCP ["Google Cloud"]
-        Run -->|環境変数経由で参照| SM ["Secret Manager<br>(db-password)"]
-        Run -->|DBアクセス| DB [("Cloud SQL (PostgreSQL)<br>(handson-postgres)")]
-        
-        SA ["Cloud Run サービスアカウント"] -.->|権限付与| Run
-        SA -.->|Secret参照権限| SM
+        Run["Cloud Run (v2)<br/>(handson-app)"]
+        SM["Secret Manager<br/>(db-password)"]
+        DB[("Cloud SQL (PostgreSQL)<br/>(handson-postgres)")]
+        SA["Cloud Run サービスアカウント"]
     end
 
+    User -->|"HTTPアクセス"| Run
+    Run -->|"環境変数経由で参照"| SM
+    Run -->|"DBアクセス"| DB
+    SA -.->|"権限付与"| Run
+    SA -.->|"Secret参照権限"| SM
 ```
 
 ## 作成されるリソース
@@ -95,26 +96,25 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Pipeline ["データパイプライン / 処理プログラム"]
+    Pipeline["データパイプライン / 処理プログラム"]
     
     subgraph GCP ["Google Cloud"]
-        SA ["データパイプライン用 SA<br>(data-pipeline-sa)"]
+        SA["データパイプライン用 SA<br/>(data-pipeline-sa)"]
         
         subgraph Storage ["データレイク層"]
-            GCS [("Cloud Storage (GCS)<br>(ログ・CSVファイル等)")]
+            GCS[("Cloud Storage (GCS)<br/>(ログ・CSVファイル等)")]
         end
         
         subgraph Analytics ["データウェアハウス層"]
-            BQ_DS ["BigQuery Dataset"]
-            BQ_Table [("BigQuery Table<br>(access_logs)")]
+            BQ_DS["BigQuery Dataset"]
+            BQ_Table[("BigQuery Table<br/>(access_logs)")]
             BQ_DS --- BQ_Table
         end
     end
 
-    Pipeline -->|SA権限で認証| SA
-    SA -->|1. ファイルアップロード| GCS
-    SA -->|2. データロード・クエリ実行| BQ_Table
-
+    Pipeline -->|"SA権限で認証"| SA
+    SA -->|"1. ファイルアップロード"| GCS
+    SA -->|"2. データロード・クエリ実行"| BQ_Table
 ```
 
 ## 作成されるリソース
