@@ -45,6 +45,25 @@ flowchart TD
 
 ## 実行コマンド
 
+### Terraform コマンドのインストール
+
+- 環境に応じてインストールしてください
+
+```
+# Cloud Console の場合
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+
+# インストール成功を確認するためにバージョンの確認
+/usr/bin/terraform version
+
+# path を通す
+echo 'export PATH=$PATH:/usr/bin' >> ~/.bashrc
+source ~/.bashrc
+```
+
+
 ### 1. Google Cloud 認証・初期設定
 
 - 1-1. gcloud CLI のユーザー認証（ブラウザが起動します）
@@ -53,19 +72,13 @@ flowchart TD
 gcloud auth login
 ```
 
-- 1-2. TerraformがGCP APIを操作するためのローカル認証情報（ADC）を発行
+- 1-2. Terraformが GCP API を操作するためのローカル認証情報（ADC）を発行
 
 ```
 gcloud auth application-default login
 ```
 
-- 1-3. 使用するGCPプロジェクトIDをセット
-
-```
-gcloud config set project YOUR_PROJECT_ID
-```
-
-- 1-4. (任意) TerraformのAPI有効化処理自体に必要な「Service Usage API」を有効化
+- 1-3. (任意) TerraformのAPI有効化処理自体に必要な「Service Usage API」を有効化
 
 ```
 gcloud services enable serviceusage.googleapis.com
