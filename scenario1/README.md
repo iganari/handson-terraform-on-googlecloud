@@ -12,23 +12,24 @@ Google Cloud上にカスタムVPCネットワークを構築し、外部IPアド
 
 ```mermaid
 flowchart TD
+    Internet((インターネット))
+    IAP["Identity-Aware Proxy<br/>(IAP)"]
+
     subgraph VPC ["カスタム VPC (handson-vpc)"]
+        Router["Cloud Router"]
+        NAT["Cloud NAT"]
+        
         subgraph Subnet ["プライベートサブネット (10.0.1.0/24)"]
-            VM ["Compute Engine (VM)<br>・外部IPなし<br>・Nginx自動導入"]
+            VM["Compute Engine (VM)<br/>・外部IPなし<br/>・Nginx自動導入"]
         end
-        Router ["Cloud Router"]
-        NAT ["Cloud NAT"]
     end
 
-    Internet ((インターネット))
-    IAP ["Identity-Aware Proxy<br>(IAP)"]
-
-    VM -->|アウトバウンド通信| NAT
+    VM -->|"アウトバウンド通信"| NAT
     NAT --> Router
-    Router -->|パッチ取得・更新| Internet
-    IAP -->|SSH接続 (Port 22)| VM
-
+    Router -->|"パッチ取得・更新"| Internet
+    IAP -->|"SSH接続 (Port 22)"| VM
 ```
+
 
 ## 作成されるリソース
 
