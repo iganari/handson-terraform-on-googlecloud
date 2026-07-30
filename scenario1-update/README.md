@@ -82,7 +82,6 @@ gcloud auth application-default login
 
 ```
 gcloud services enable serviceusage.googleapis.com
-gcloud services enable cloudresourcemanager.googleapis.com
 ```
 
 ### 2. Terraform の実行

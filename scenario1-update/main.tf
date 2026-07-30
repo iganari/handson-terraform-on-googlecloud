@@ -1,33 +1,85 @@
+# ----------------------------------------------------------
+#
 # 0. 必要なAPIの有効化
+#
+# ----------------------------------------------------------
 locals {
-  scenario1_services = toset([
+  google_project_services = toset([
     "compute.googleapis.com"
   ])
 }
+resource "google_project_service" "main" {
+  for_each           = local.google_project_services
 
-resource "google_project_service" "scenario1" {
-  for_each           = local.scenario1_services
   service            = each.value
   disable_on_destroy = false
 }
 
+
+
+
+# ----------------------------------------------------------
+#
 # 1. カスタムVPCの作成
-resource "google_compute_network" "vpc_network" {
-  name                    = "handson-vpc"
-  auto_create_subnetworks = false
+#
+# ----------------------------------------------------------
+locals {
+  compute_networks = [
+    {
+      name = "handson"
+      auto_create_subnetworks = false
+    },
+  ]
+}
+resource "google_compute_network" "main" {
+  depends_on = [google_project_service.main]
+  for_each = { for z in local.compute_networks : z.name => z }
 
-  depends_on = [google_project_service.scenario1]
+  name                    = each.value.name
+  auto_create_subnetworks = each.value.auto_create_subnetworks
 }
 
+
+# ----------------------------------------------------------
+#
 # 2. サブネットの作成
-resource "google_compute_subnetwork" "subnet" {
-  name          = "handson-subnet"
-  ip_cidr_range = "10.0.1.0/24"
-  region        = "asia-northeast1"
-  network       = google_compute_network.vpc_network.id
+#
+# ----------------------------------------------------------
+locals {
+  compute_subnetworks = [
+    {
+      name = "handson-subnet"
+      ip_cidr_range = "10.0.1.0/24"
+      region        = "asia-northeast1"
+      network       = google_compute_network.main.id
+    },
+  ]
+}
+resource "google_compute_subnetwork" "main" {
+  for_each = { for z in local.compute_subnetworks : z.name => z }
+
+  name          = each.value.name
+  ip_cidr_range = each.value.ip_cidr_range
+  region        = each.value.region
+  network       = each.value.network
 }
 
-# 3. Cloud Router (NAT用)
+
+# ----------------------------------------------------------
+#
+# 23. Cloud Router (NAT用)
+#
+# ----------------------------------------------------------
+locals {
+  compute_routers = [
+    {
+      name = "handson-subnet"
+      ip_cidr_range = "10.0.1.0/24"
+      region        = "asia-northeast1"
+      network       = google_compute_network.main.id
+    },
+  ]
+}
 resource "google_compute_router" "router" {
   name    = "handson-router"
   region  = google_compute_subnetwork.subnet.region
