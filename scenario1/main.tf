@@ -5,7 +5,7 @@ locals {
   ])
 }
 
-resource "google_project_service" "scenario1_api" {
+resource "google_project_service" "scenario1" {
   for_each           = local.scenario1_services
   service            = each.value
   disable_on_destroy = false
@@ -16,7 +16,7 @@ resource "google_compute_network" "vpc_network" {
   name                    = "handson-vpc"
   auto_create_subnetworks = false
 
-  depends_on = [google_project_service.scenario1_api]
+  depends_on = [google_project_service.scenario1]
 }
 
 # 2. サブネットの作成

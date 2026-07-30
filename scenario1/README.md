@@ -42,3 +42,59 @@ flowchart TD
 * Dynamic/Auto割り当てではなく、固定IP（`google_compute_address`）を明示的に定義・アタッチするCloud NATの構成手法
 * Ops Agent等を使ったモニタリング拡張を見据えた最新標準OS（Debian 12）でのプロビジョニング
 * `metadata_startup_script` を用いた初期セットアップの自動化
+
+## 実行コマンド
+
+### 1. Google Cloud 認証・初期設定
+
+- 1-1. gcloud CLI のユーザー認証（ブラウザが起動します）
+
+```
+gcloud auth login
+```
+
+- 1-2. TerraformがGCP APIを操作するためのローカル認証情報（ADC）を発行
+
+```
+gcloud auth application-default login
+```
+
+- 1-3. 使用するGCPプロジェクトIDをセット
+
+```
+gcloud config set project YOUR_PROJECT_ID
+```
+
+- 1-4. (任意) TerraformのAPI有効化処理自体に必要な「Service Usage API」を有効化
+
+```
+gcloud services enable serviceusage.googleapis.com
+```
+
+### 2. Terraform の実行
+
+- 2-1. ワークスペースの初期化 (プロバイダーのダウンロード)
+
+```
+terraform init
+```
+
+- 2-2. 実行計画の確認 (作成されるリソースの事前チェック)
+
+```
+terraform plan
+```
+
+- 2-3. リソースの作成実行
+
+```
+terraform apply
+```
+
+### 3. 後片付け（リソース削除）
+
+- 3-1. 作成した全リソースの削除
+
+```
+terraform destroy
+```
